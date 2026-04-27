@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARTEMIS II — MISSION TIMELINE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;700&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+  --gold: #FFD700;
+  --red: #E8303A;
+  --blue: #1A5CFF;
+  --cyan: #00D4FF;
+  --silver: #A8B8CC;
+  --dark: #03050C;
+  --panel: rgba(8,14,28,0.85);
+  --border: rgba(255,215,0,0.25);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--dark);
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── HEADER ─── */
+header {
+  position: relative;
+  text-align: center;
+  padding: 36px 20px 24px;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 120% at 50% 0%, rgba(26,92,255,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.alert-stripe {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: repeating-linear-gradient(90deg, var(--red) 0,var(--red) 16px, transparent 16px, transparent 32px);
+  animation: stripe 0.8s linear infinite;
+}
+@keyframes stripe { to { background-position: 32px 0; } }
+
+.header-tag {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  letter-spacing: 6px;
+  color: var(--red);
+  margin-bottom: 8px;
+}
+.header-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px,7vw,96px);
+  letter-spacing: 10px;
+  line-height: 0.9;
+  color: #fff;
+  text-shadow: 0 0 60px rgba(26,92,255,0.5);
+}
+.header-title span { color: var(--gold); text-shadow: 0 0 40px rgba(255,215,0,0.5); }
+.header-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  letter-spacing: 5px;
+  color: var(--silver);
+  margin-top: 10px;
+  font-weight: 300;
+}
+.header-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.hstat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.hstat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+.hstat-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 7px;
+  letter-spacing: 3px;
+  color: var(--silver);
+  text-transform: uppercase;
+}
+.corner { position: absolute; width: 40px; height: 40px; border-color: var(--gold); border-style: solid; opacity: 0.6; }
+.corner.tl { top:12px;left:16px;border-width:2px 0 0 2px; }
+.corner.tr { top:12px;right:16px;border-width:2px 2px 0 0; }
+
+/* ─── MAIN LAYOUT ─── */
+main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+/* ─── SECTION LABEL ─── */
+.section-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  letter-spacing: 5px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before {
+  content: '◈';
+  color: var(--red);
+  font-size: 10px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ─── FLIGHT PATH CANVAS ─── */
+.flight-path-wrap {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.flight-path-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(26,92,255,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+#flightCanvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ─── TIMELINE ─── */
+.timeline-wrap {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 24px 24px 32px;
+  overflow: hidden;
+  position: relative;
+}
+
+.timeline-scroll {
+  overflow-x: auto;
+  padding-bottom: 12px;
+}
+.timeline-scroll::-webkit-scrollbar { height: 3px; }
+.timeline-scroll::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+.timeline-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+
+.timeline-track {
+  display: flex;
+  align-items: flex-start;
+  min-width: 900px;
+  padding: 12px 0 8px;
+  position: relative;
+}
+
+/* Center spine */
+.timeline-track::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: 72px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold) 5%, var(--gold) 95%, transparent);
+  z-index: 0;
+}
+
+.tl-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.tl-item:hover .tl-card { border-color: var(--gold); background: rgba(255,215,0,0.08); }
+.tl-item:hover .tl-dot { transform: scale(1.4); box-shadow: 0 0 16px var(--gold); }
+
+/* Top label (date) */
+.tl-top {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--silver);
+  margin-bottom: 8px;
+  text-align: center;
+  white-space: nowrap;
+}
+.tl-top.active { color: var(--gold); }
+
+/* Dot */
+.tl-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background: var(--dark);
+  z-index: 1;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+.tl-dot.filled {
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
+}
+.tl-dot.current {
+  background: var(--red);
+  border-color: var(--red);
+  box-shadow: 0 0 14px var(--red);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 10px var(--red); }
+  50% { box-shadow: 0 0 24px var(--red), 0 0 40px rgba(232,48,58,0.4); }
+}
+
+/* Card below */
+.tl-card {
+  margin-top: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,215,0,0.15);
+  border-radius: 2px;
+  padding: 10px 10px 8px;
+  width: calc(100% - 16px);
+  transition: border-color 0.2s, background 0.2s;
+}
+.tl-day {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  line-height: 1;
+}
+.tl-event {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #fff;
+  margin-top: 3px;
+  line-height: 1.3;
+}
+.tl-detail {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 10px;
+  color: var(--silver);
+  margin-top: 4px;
+  line-height: 1.4;
+  font-weight: 300;
+}
+.tl-badge {
+  display: inline-block;
+  font-family: 'Orbitron', monospace;
+  font-size: 7px;
+  letter-spacing: 2px;
+  padding: 2px 6px;
+  border-radius: 1px;
+  margin-top: 5px;
+  text-transform: uppercase;
+}
+.badge-launch { background: rgba(232,48,58,0.2); color: var(--red); border: 1px solid var(--red); }
+.badge-tli    { background: rgba(26,92,255,0.2); color: var(--blue); border: 1px solid var(--blue); }
+.badge-flyby  { background: rgba(255,215,0,0.15); color: var(--gold); border: 1px solid var(--gold); }
+.badge-return { background: rgba(0,212,255,0.15); color: var(--cyan); border: 1px solid var(--cyan); }
+.badge-splash { background: rgba(0,212,255,0.2); color: var(--cyan); border: 1px solid var(--cyan); }
+.badge-done   { background: rgba(100,255,100,0.12); color: #6FFF6F; border: 1px solid #6FFF6F; }
+
+/* ─── CREW + KEY STATS ─── */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 640px) {
+  .bottom-grid { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 20px 24px;
+}
+
+/* Crew */
+.crew-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 4px;
+}
+.crew-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.crew-badge {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background: linear-gradient(135deg,#10183A,#060A14);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  color: var(--gold);
+  box-shadow: 0 0 12px rgba(255,215,0,0.25);
+  flex-shrink: 0;
+}
+.crew-info {}
+.crew-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: #fff;
+  line-height: 1;
+}
+.crew-role {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--silver);
+  font-weight: 300;
+}
+.crew-agency {
+  font-family: 'Orbitron', monospace;
+  font-size: 7px;
+  letter-spacing: 3px;
+  color: var(--red);
+  margin-left: 4px;
+}
+
+/* Key stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 4px;
+}
+.stat-box {
+  border-left: 2px solid var(--gold);
+  padding-left: 10px;
+}
+.stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: var(--gold);
+  line-height: 1;
+}
+.stat-unit {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--silver);
+  font-weight: 300;
+}
+.stat-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 7px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 3px;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--border);
+  text-align: center;
+  padding: 20px;
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ─── ANIMATIONS ─── */
+.fade-in { animation: fadeIn 0.8s ease both; }
+.fade-in-1 { animation-delay: 0.1s; }
+.fade-in-2 { animation-delay: 0.25s; }
+.fade-in-3 { animation-delay: 0.4s; }
+.fade-in-4 { animation-delay: 0.55s; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+/* ─── BACK BUTTON ─── */
+#back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px 9px 14px;
+  background: rgba(6,10,22,0.7);
+  border: 1.5px solid rgba(255,215,0,0.4);
+  border-radius: 2px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+  position: absolute;
+  top: 36px;
+  left: 24px;
+}
+#back-btn:hover {
+  background: rgba(255,215,0,0.08);
+  box-shadow: 0 0 20px rgba(255,215,0,0.2);
+  transform: translateX(-2px);
+}
+.back-arrow { font-size: 14px; color: var(--gold); transition: transform 0.2s; }
+#back-btn:hover .back-arrow { transform: translateX(-3px); }
+.back-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  line-height: 1;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="fade-in">
+  <div class="alert-stripe"></div>
+  <a id="back-btn" href="index.html">
+    <span class="back-arrow">‹</span>
+    <span class="back-text">BACK TO MISSION</span>
+  </a>
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="header-tag">◈ NASA · ESA · CSA · KENNEDY SPACE CENTER ◈</div>
+  <div class="header-title">ARTEMIS <span>II</span></div>
+  <div class="header-sub">FIRST CREWED LUNAR FLYBY SINCE APOLLO 17 · APRIL 2026</div>
+  <div class="header-stats">
+    <div class="hstat"><span class="hstat-val">APR 1</span><span class="hstat-label">Launch</span></div>
+    <div class="hstat"><span class="hstat-val">10 DAYS</span><span class="hstat-label">Duration</span></div>
+    <div class="hstat"><span class="hstat-val">4</span><span class="hstat-label">Crew</span></div>
+    <div class="hstat"><span class="hstat-val">252,756</span><span class="hstat-label">Max Distance (mi)</span></div>
+    <div class="hstat"><span class="hstat-val">APR 10</span><span class="hstat-label">Splashdown</span></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- FLIGHT PATH -->
+  <section class="fade-in fade-in-1">
+    <div class="section-label">FLIGHT PATH — FIGURE-EIGHT LUNAR FREE-RETURN TRAJECTORY</div>
+    <div class="flight-path-wrap">
+      <canvas id="flightCanvas"></canvas>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="fade-in fade-in-2">
+    <div class="section-label">MISSION TIMELINE — APRIL 1–10, 2026</div>
+    <div class="timeline-wrap">
+      <div class="timeline-scroll">
+        <div class="timeline-track" id="tlTrack"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM GRID -->
+  <div class="bottom-grid fade-in fade-in-3">
+
+    <!-- CREW -->
+    <div class="panel">
+      <div class="section-label">CREW MANIFEST</div>
+      <div class="crew-list">
+        <div class="crew-row">
+          <div class="crew-badge">RW</div>
+          <div class="crew-info">
+            <div class="crew-name">REID WISEMAN</div>
+            <div class="crew-role">COMMANDER <span class="crew-agency">NASA</span></div>
+          </div>
+        </div>
+        <div class="crew-row">
+          <div class="crew-badge">VG</div>
+          <div class="crew-info">
+            <div class="crew-name">VICTOR GLOVER</div>
+            <div class="crew-role">PILOT <span class="crew-agency">NASA</span></div>
+          </div>
+        </div>
+        <div class="crew-row">
+          <div class="crew-badge">CK</div>
+          <div class="crew-info">
+            <div class="crew-name">CHRISTINA KOCH</div>
+            <div class="crew-role">MISSION SPECIALIST <span class="crew-agency">NASA</span></div>
+          </div>
+        </div>
+        <div class="crew-row">
+          <div class="crew-badge">JH</div>
+          <div class="crew-info">
+            <div class="crew-name">JEREMY HANSEN</div>
+            <div class="crew-role">MISSION SPECIALIST <span class="crew-agency">CSA</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KEY STATS -->
+    <div class="panel">
+      <div class="section-label">MISSION DATA</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-val">6:35 PM</div>
+          <div class="stat-unit">EDT</div>
+          <div class="stat-label">Launch Time</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">39B</div>
+          <div class="stat-unit">Launch Complex</div>
+          <div class="stat-label">Kennedy Space Center</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">8.8M</div>
+          <div class="stat-unit">lbs thrust</div>
+          <div class="stat-label">Liftoff Force</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">4,100</div>
+          <div class="stat-unit">miles beyond far side</div>
+          <div class="stat-label">Closest Lunar Pass</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">252,756</div>
+          <div class="stat-unit">miles from Earth</div>
+          <div class="stat-label">New Distance Record</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">35×</div>
+          <div class="stat-unit">speed of sound</div>
+          <div class="stat-label">Re-entry Velocity</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">3,000°</div>
+          <div class="stat-unit">Fahrenheit</div>
+          <div class="stat-label">Re-entry Heat</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">32</div>
+          <div class="stat-unit">cameras aboard</div>
+          <div class="stat-label">Orion Imaging</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>◈ ARTEMIS II · ORION SPACECRAFT "INTEGRITY" · SLS BLOCK 1 · NASA / ESA / CSA ◈</footer>
+
+<script>
+// ─── TIMELINE DATA ─────────────────────────────────────────────────────────
+const EVENTS = [
+  {
+    date: 'APR 1',
+    day: 'DAY 1',
+    event: 'LIFTOFF',
+    detail: '6:35 PM EDT from LC-39B. SLS generates 8.8M lbs of thrust. Solar arrays deploy.',
+    badge: 'badge-launch', badgeText: 'LAUNCH',
+    done: true, phase: 'launch'
+  },
+  {
+    date: 'APR 1–2',
+    day: 'DAY 1–2',
+    event: 'HIGH EARTH ORBIT',
+    detail: 'Orion circularizes into high elliptical orbit. Crew suits off. TLI burn at 7:49 PM.',
+    badge: 'badge-tli', badgeText: 'TLI BURN',
+    done: true, phase: 'earth'
+  },
+  {
+    date: 'APR 2–3',
+    day: 'DAY 2–3',
+    event: 'TRANS-LUNAR COAST',
+    detail: 'Orion departs Earth orbit. Crew tests life-support, conducts proximity ops demo.',
+    badge: null,
+    done: true, phase: 'coast'
+  },
+  {
+    date: 'APR 3–4',
+    day: 'DAY 3–4',
+    event: 'OUTBOUND COAST',
+    detail: 'Koch photographs Earth from window. Systems checks. ~218,000 km from Earth.',
+    badge: null,
+    done: true, phase: 'coast'
+  },
+  {
+    date: 'APR 5',
+    day: 'DAY 5',
+    event: 'LUNAR APPROACH',
+    detail: 'Moon visible from windows. Distance record preparations begin.',
+    badge: null,
+    done: true, phase: 'approach'
+  },
+  {
+    date: 'APR 6',
+    day: 'DAY 6',
+    event: 'LUNAR FLYBY',
+    detail: 'Pass 4,100 mi beyond far side. New distance record: 252,756 mi. Earthrise photos captured.',
+    badge: 'badge-flyby', badgeText: 'HISTORIC',
+    done: true, phase: 'flyby'
+  },
+  {
+    date: 'APR 7',
+    day: 'DAY 7',
+    event: 'POST-FLYBY SCIENCE',
+    detail: 'Lunar science downlinks. Slingshot trajectory established. USS Murtha departs San Diego.',
+    badge: null,
+    done: true, phase: 'return'
+  },
+  {
+    date: 'APR 8–9',
+    day: 'DAY 8–9',
+    event: 'EARTH RETURN',
+    detail: 'Return trajectory burns. Crew studies re-entry procedures. Final day of deep space.',
+    badge: 'badge-return', badgeText: 'RETURN',
+    done: true, phase: 'return'
+  },
+  {
+    date: 'APR 10',
+    day: 'DAY 10',
+    event: 'RE-ENTRY & SPLASHDOWN',
+    detail: '8:07 PM EDT splashdown off San Diego. Crew extracted by USS John P. Murtha.',
+    badge: 'badge-splash', badgeText: 'SPLASHDOWN',
+    done: true, phase: 'splash'
+  },
+  {
+    date: 'APR 11',
+    day: 'POST',
+    event: 'CREW RETURNS HOUSTON',
+    detail: 'Crew arrives Ellington Field. Orion recovery begins. Heat shield analysis underway.',
+    badge: 'badge-done', badgeText: 'COMPLETE',
+    done: true, phase: 'done'
+  },
+];
+
+// Build timeline
+const track = document.getElementById('tlTrack');
+EVENTS.forEach((ev, i) => {
+  const item = document.createElement('div');
+  item.className = 'tl-item';
+  item.innerHTML = `
+    <div class="tl-top${ev.phase==='flyby'?' active':''}">${ev.date}</div>
+    <div class="tl-dot ${ev.done ? (ev.phase==='launch'?'current':'filled') : ''}"></div>
+    <div class="tl-card">
+      <div class="tl-day">${ev.day}</div>
+      <div class="tl-event">${ev.event}</div>
+      <div class="tl-detail">${ev.detail}</div>
+      ${ev.badge ? `<div class="tl-badge ${ev.badge}">${ev.badgeText}</div>` : ''}
+    </div>
+  `;
+  track.appendChild(item);
+});
+
+// ─── FLIGHT PATH CANVAS ────────────────────────────────────────────────────
+const canvas = document.getElementById('flightCanvas');
+const ctx = canvas.getContext('2d');
+
+function setupCanvas() {
+  const W = canvas.parentElement.clientWidth - 48;
+  const H = Math.min(W * 0.45, 420);
+  canvas.width = W;
+  canvas.height = H;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  return { W, H };
+}
+
+// Star field
+let stars = [];
+function initStars(W, H) {
+  stars = [];
+  for (let i = 0; i < 300; i++) {
+    stars.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.2 + 0.2,
+      alpha: Math.random() * 0.7 + 0.2,
+      tw: Math.random() * Math.PI * 2,
+    });
+  }
+}
+
+let animT = 0;
+let raf;
+
+function draw() {
+  const { W, H } = setupCanvas();
+  if (stars.length === 0) initStars(W, H);
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  ctx.fillStyle = '#03050C';
+  ctx.fillRect(0, 0, W, H);
+
+  // Nebula
+  const neb1 = ctx.createRadialGradient(W*0.25, H*0.5, 0, W*0.25, H*0.5, W*0.28);
+  neb1.addColorStop(0, 'rgba(26,92,255,0.07)');
+  neb1.addColorStop(1, 'transparent');
+  ctx.fillStyle = neb1;
+  ctx.fillRect(0, 0, W, H);
+
+  const neb2 = ctx.createRadialGradient(W*0.78, H*0.45, 0, W*0.78, H*0.45, W*0.22);
+  neb2.addColorStop(0, 'rgba(100,60,200,0.06)');
+  neb2.addColorStop(1, 'transparent');
+  ctx.fillStyle = neb2;
+  ctx.fillRect(0, 0, W, H);
+
+  // Stars
+  animT += 0.008;
+  for (const s of stars) {
+    s.tw += 0.018;
+    const a = s.alpha * (0.7 + 0.3 * Math.sin(s.tw));
+    ctx.globalAlpha = a;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // ── Positions ──
+  const earthX = W * 0.12, earthY = H * 0.5;
+  const earthR = Math.min(W, H) * 0.095;
+  const moonX  = W * 0.83, moonY  = H * 0.45;
+  const moonR  = Math.min(W, H) * 0.065;
+
+  // ── Figure-8 path ──
+  // Goes Earth → high ellipse → TLI → coast → lunar approach → flyby (behind moon) → return → Earth
+  function pathPoint(t) {
+    // t: 0=launch, 1=splashdown
+    // Model as a figure-8 bezier:
+    //   Leg 1: Earth → moon (t 0→0.5)
+    //   Leg 2: moon → Earth (t 0.5→1)
+    const ex = earthX, ey = earthY;
+    const mx = moonX, my = moonY;
+    const mid1x = W * 0.38, mid1y = H * 0.08; // outbound arc up
+    const mid2x = W * 0.65, mid2y = H * 0.08;
+    const mid3x = W * 0.72, mid3y = H * 0.85; // return arc below
+    const mid4x = W * 0.38, mid4y = H * 0.88;
+
+    if (t <= 0.5) {
+      const u = t / 0.5;
+      // Cubic bezier: Earth → mid1 → mid2 → Moon
+      const u1 = 1 - u;
+      return {
+        x: u1**3*ex + 3*u1**2*u*mid1x + 3*u1*u**2*mid2x + u**3*mx,
+        y: u1**3*ey + 3*u1**2*u*mid1y + 3*u1*u**2*mid2y + u**3*my,
+      };
+    } else {
+      const u = (t - 0.5) / 0.5;
+      const u1 = 1 - u;
+      return {
+        x: u1**3*mx + 3*u1**2*u*mid3x + 3*u1*u**2*mid4x + u**3*ex,
+        y: u1**3*my + 3*u1**2*u*mid3y + 3*u1*u**2*mid4y + u**3*ey,
+      };
+    }
+  }
+
+  // Draw dashed path
+  ctx.save();
+  ctx.setLineDash([6, 8]);
+  ctx.strokeStyle = 'rgba(255,215,0,0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const p = pathPoint(i / 200);
+    i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Draw glowing path (partial, animated)
+  const progress = 1.0; // Mission complete
+  ctx.save();
+  ctx.strokeStyle = 'rgba(26,92,255,0.6)';
+  ctx.lineWidth = 2.5;
+  ctx.shadowColor = 'rgba(26,92,255,0.8)';
+  ctx.shadowBlur = 10;
+  ctx.beginPath();
+  for (let i = 0; i <= 200 * progress; i++) {
+    const p = pathPoint(i / 200);
+    i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Event dots on path ──
+  const eventT = [0, 0.09, 0.22, 0.34, 0.43, 0.5, 0.62, 0.77, 0.91, 1.0];
+  const eventColors = ['#E8303A','#1A5CFF','rgba(200,200,200,0.7)','rgba(200,200,200,0.7)','#FFD700','#FFD700','#00D4FF','#00D4FF','#1A5CFF','#6FFF6F'];
+  const eventLabels = ['LAUNCH','TLI','DAY 3','DAY 4','APPROACH','FLYBY','DAY 7','DAY 8–9','RE-ENTRY','SPLASHDOWN'];
+
+  for (let i = 0; i < eventT.length; i++) {
+    const p = pathPoint(eventT[i]);
+    const col = eventColors[i];
+    const isKey = [0,1,5,9].includes(i);
+    const r = isKey ? 7 : 5;
+
+    ctx.save();
+    ctx.fillStyle = col;
+    ctx.shadowColor = col;
+    ctx.shadowBlur = isKey ? 16 : 8;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Label
+    const above = eventT[i] <= 0.5;
+    const lx = p.x;
+    let ly = above ? p.y - r - 7 : p.y + r + 14;
+
+    ctx.save();
+    ctx.font = `600 ${isKey ? 9 : 8}px 'Orbitron', monospace`;
+    ctx.fillStyle = isKey ? col : 'rgba(200,210,220,0.75)';
+    ctx.textAlign = 'center';
+    ctx.fillText(eventLabels[i], lx, ly);
+    ctx.restore();
+  }
+
+  // ── Direction arrows on path ──
+  const arrowTs = [0.18, 0.40, 0.60, 0.82];
+  for (const at of arrowTs) {
+    const p0 = pathPoint(at - 0.01);
+    const p1 = pathPoint(at + 0.01);
+    const angle = Math.atan2(p1.y - p0.y, p1.x - p0.x);
+    const pm = pathPoint(at);
+    ctx.save();
+    ctx.translate(pm.x, pm.y);
+    ctx.rotate(angle);
+    ctx.fillStyle = 'rgba(255,215,0,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(8, 0);
+    ctx.lineTo(-4, -4);
+    ctx.lineTo(-4, 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ── Earth ──
+  const earthGrd = ctx.createRadialGradient(earthX - earthR*0.3, earthY - earthR*0.3, earthR*0.1, earthX, earthY, earthR);
+  earthGrd.addColorStop(0, '#4A90E2');
+  earthGrd.addColorStop(0.45, '#1A4AA8');
+  earthGrd.addColorStop(0.8, '#0A1E5A');
+  earthGrd.addColorStop(1, '#050D2A');
+  ctx.fillStyle = earthGrd;
+  ctx.shadowColor = 'rgba(70,140,255,0.5)';
+  ctx.shadowBlur = 30;
+  ctx.beginPath();
+  ctx.arc(earthX, earthY, earthR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Atmosphere
+  const atmGrd = ctx.createRadialGradient(earthX, earthY, earthR * 0.82, earthX, earthY, earthR * 1.35);
+  atmGrd.addColorStop(0, 'rgba(80,180,255,0)');
+  atmGrd.addColorStop(0.5, 'rgba(80,180,255,0.14)');
+  atmGrd.addColorStop(1, 'rgba(80,180,255,0)');
+  ctx.fillStyle = atmGrd;
+  ctx.beginPath();
+  ctx.arc(earthX, earthY, earthR * 1.35, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.save();
+  ctx.font = `700 ${Math.max(9,earthR*0.28)}px 'Bebas Neue'`;
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.textAlign = 'center';
+  ctx.fillText('EARTH', earthX, earthY + earthR + 14);
+  ctx.restore();
+
+  // ── Moon ──
+  const moonGrd = ctx.createRadialGradient(moonX - moonR*0.25, moonY - moonR*0.25, moonR*0.05, moonX, moonY, moonR);
+  moonGrd.addColorStop(0, '#D8DDE8');
+  moonGrd.addColorStop(0.4, '#A0A8B8');
+  moonGrd.addColorStop(0.85, '#606878');
+  moonGrd.addColorStop(1, '#282E3A');
+  ctx.fillStyle = moonGrd;
+  ctx.shadowColor = 'rgba(200,210,255,0.35)';
+  ctx.shadowBlur = 24;
+  ctx.beginPath();
+  ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Moon craters
+  ctx.save();
+  ctx.beginPath(); ctx.arc(moonX, moonY, moonR, 0, Math.PI*2); ctx.clip();
+  const craters = [{ox:-0.28,oy:0.18,r:0.18},{ox:0.25,oy:-0.22,r:0.13},{ox:-0.08,oy:-0.28,r:0.1},{ox:0.18,oy:0.32,r:0.09}];
+  for (const cr of craters) {
+    const cg = ctx.createRadialGradient(moonX+cr.ox*moonR, moonY+cr.oy*moonR, 0, moonX+cr.ox*moonR, moonY+cr.oy*moonR, cr.r*moonR);
+    cg.addColorStop(0, 'rgba(30,40,60,0.6)');
+    cg.addColorStop(1, 'rgba(30,40,60,0)');
+    ctx.fillStyle = cg;
+    ctx.beginPath(); ctx.arc(moonX+cr.ox*moonR, moonY+cr.oy*moonR, cr.r*moonR, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+
+  ctx.save();
+  ctx.font = `700 ${Math.max(9,moonR*0.33)}px 'Bebas Neue'`;
+  ctx.fillStyle = 'rgba(255,215,0,0.75)';
+  ctx.textAlign = 'center';
+  ctx.fillText('MOON', moonX, moonY - moonR - 8);
+  ctx.restore();
+
+  // ── Record annotation ──
+  const flybyP = pathPoint(0.5);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,215,0,0.4)';
+  ctx.setLineDash([3,5]);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(flybyP.x, flybyP.y - 10);
+  ctx.lineTo(flybyP.x, flybyP.y - 36);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font = '700 8px Orbitron, monospace';
+  ctx.fillStyle = 'rgba(255,215,0,0.65)';
+  ctx.textAlign = 'center';
+  ctx.fillText('252,756 MI · NEW RECORD', flybyP.x, flybyP.y - 42);
+  ctx.restore();
+
+  // ── Spacecraft pulse ──
+  // After mission is complete, show it at splashdown (t=1.0)
+  const shipT = 1.0;
+  const ship = pathPoint(shipT);
+  const pulsR = 8 + 4 * Math.sin(animT * 3);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(110,255,110,0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(ship.x, ship.y, pulsR, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = '#6FFF6F';
+  ctx.shadowColor = '#6FFF6F';
+  ctx.shadowBlur = 12;
+  ctx.beginPath();
+  ctx.arc(ship.x, ship.y, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Vignette
+  const vig = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.3, W/2, H/2, Math.min(W,H)*0.75);
+  vig.addColorStop(0, 'rgba(0,0,0,0)');
+  vig.addColorStop(1, 'rgba(0,0,0,0.5)');
+  ctx.fillStyle = vig;
+  ctx.fillRect(0, 0, W, H);
+
+  raf = requestAnimationFrame(draw);
+}
+
+window.addEventListener('resize', () => {
+  cancelAnimationFrame(raf);
+  stars = [];
+  draw();
+});
+
+draw();
+</script>
+</body>
+</html>

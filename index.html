@@ -318,6 +318,82 @@
     vertical-align: middle;
   }
   @keyframes blink { 50% { opacity: 0; } }
+
+  /* ─── FURTHER DETAILS BUTTON ─── */
+  #details-btn {
+    position: fixed;
+    bottom: 36px;
+    right: 32px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 22px 11px 16px;
+    background: rgba(6,10,22,0.88);
+    border: 1.5px solid var(--gold);
+    border-radius: 2px;
+    cursor: pointer;
+    text-decoration: none;
+    animation: btnAppear 1s cubic-bezier(0.16,1,0.3,1) 1.6s both;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+    box-shadow: 0 0 18px rgba(255,215,0,0.12), inset 0 0 0 0 rgba(255,215,0,0);
+  }
+  #details-btn:hover {
+    background: rgba(255,215,0,0.1);
+    box-shadow: 0 0 32px rgba(255,215,0,0.3), 0 0 8px rgba(255,215,0,0.15);
+    transform: translateY(-2px);
+  }
+  #details-btn:active { transform: translateY(0); }
+  @keyframes btnAppear {
+    from { opacity:0; transform: translateY(12px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .btn-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+  .btn-icon span {
+    display: block;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--gold);
+    transition: width 0.2s;
+  }
+  .btn-icon span:nth-child(1) { width: 16px; }
+  .btn-icon span:nth-child(2) { width: 12px; }
+  .btn-icon span:nth-child(3) { width: 16px; }
+  #details-btn:hover .btn-icon span:nth-child(2) { width: 16px; }
+  .btn-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .btn-text-top {
+    font-family: 'Orbitron', monospace;
+    font-size: 7px;
+    letter-spacing: 4px;
+    color: var(--red);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .btn-text-main {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .btn-arrow {
+    font-size: 14px;
+    color: var(--gold);
+    margin-left: 2px;
+    transition: transform 0.2s;
+  }
+  #details-btn:hover .btn-arrow { transform: translateX(3px); }
 </style>
 </head>
 <body>
@@ -980,5 +1056,18 @@ render();
 // Remove webgl canvas (using 2d)
 canvas.style.display = 'none';
 </script>
+
+<!-- FURTHER DETAILS BUTTON -->
+<a id="details-btn" href="details.html">
+  <div class="btn-icon">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="btn-text">
+    <span class="btn-text-top">Mission Data</span>
+    <span class="btn-text-main">FURTHER DETAILS</span>
+  </div>
+  <span class="btn-arrow">›</span>
+</a>
+
 </body>
 </html>
